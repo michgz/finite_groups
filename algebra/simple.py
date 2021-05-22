@@ -121,8 +121,74 @@ def Chevalley(family, n, q):
   return c
   
     
-    
+def Steinberg(family, n, q):
   
+  order = 0
+  
+  if family == '2A':
+    # Classic Steinberg group
+    if n <= 1:
+      raise Exception
+    x = 1
+    for i in range(1, n+1):
+      x *= (q**(i+1)-(-1)**(i+1))
+    x *= q**(n*(n+1)//2)
+    x /= math.gcd(n+1, q+1)
+    name = f"^(2)A_{n}({q}^2)"
+    order = x
+  elif family == '2D':
+    # Classic Steinberg group
+    if n <= 3:
+      raise Exception
+    x = 1
+    for i in range(1, n+1):
+      x *= (q**(2*i) - 1)
+    x *= (q**2 + 1)
+    x *= q**(n*(n-1))
+    x /= math.gcd(4, q**n + 1)
+    name = f"^(2)D_{n}({q}^2)"
+    order = x
+  elif family == '2E':
+    # Exceptional Steinberg group
+    if n != 6:
+      raise Exception
+    x = 1
+    for i in [2,5,6,8,9,12]:
+      x *= (q**i - (-1)**i)
+    x *= q**36
+    x /= math.gcd(3, q+1)
+    name = f"^(2)E_{n}({q}^2)"
+    order = x
+  elif family == '3E':
+    # Exceptional Steinberg group
+    if n != 4:
+      raise Exception
+    x = 1
+    x *= q**12
+    x *= (q**8 + q**4 + 1)
+    x *= (q**6 - 1)
+    x *= (q**2 - 1)
+    name = f"^(3)E_{n}({q}^3)"
+    order = x
+  
+  c = algebra(None)
+  c.setName(name)
+  c.setOrder(order)
+  return c
+  
+  
+def Suzuki(q):
+  
+  n = 0.5 * (math.log(q, 2) - 1)
+  if abs(n - round(n)) > 1.E-7:    # This "epsilon" value is only suitable for quite small values of q. Revisit...
+    raise Exception("q must be of form 2^(2n+1). q={0}, n={1}".format(q, n))
+  
+  name = f"^(2)B_2({q})"
+  order = q**2 * (q**2 + 1) * (q - 1)
+  c = algebra(None)
+  c.setName(name)
+  c.setOrder(order)
+  return c
   
   
   
