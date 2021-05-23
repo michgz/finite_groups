@@ -60,7 +60,7 @@ def isIsomorphic(a, b):
       else:
         j_b = pp[j_a-1]
       
-      k_b = b.cayley[j_a, j_b]
+      k_b = b.cayley[i_b, j_b]
       
       if k_a == 0:
         if k_b != 0:
@@ -82,5 +82,150 @@ def isIsomorphic(a, b):
     
 
 
+def findSubgroup(a, b):
+  # Find a permutation of elements under which "a" is a subgroup of "b". Only one
+  # such permutation is returned even if multiple exist.
+  # If there is no such permutation then None is returned.
+  
+  # TODO: should confirm that "a" is in fact a group
+  
+  n1 = a.cayley.shape[0]
+  n2 = b.cayley.shape[1]
+  
+  if not n2 >= n1:
+    return None
+  
+  for pp in itertools.combinations(range(1, n2), n1-1):
+    
+    is_good = True
+    
+    for i_a, j_a in itertools.product(range(1, n1), repeat=2):
+      
+      i_b = pp[i_a-1]
+      j_b = pp[j_a-1]
+      
+      k_a = a.cayley[i_a, j_a]
+      k_b = b.cayley[i_b, j_b]
+      
+      if k_a == 0:
+        if k_b != 0:
+          is_good = False
+      elif k_b != pp[k_a-1]:
+        is_good = False
+        
+      if not is_good:
+        break
+    
+    if is_good:
+      return pp
+      
+    # Otherwise, try another
+  
+  
+  return None
+  
 
+
+class subgroupOf:
+  # An iterator returning all permutations of elements under which b is a subgroup
+  # of a.
+  # In the general case, the iterator will either return 1 value (it is a subgroup) or
+  # no values (it is not a subgroup). Sometimes a subgroup will have multiple ways of
+  # being a subgroup, in which multiple values will be returned.
+  
+  def __init__(self, b, a):
+    
+    self.underlyingIter = None
+    self.b = b.cayley
+    self.a = a.cayley
+    self.n1 = b.cayley.shape[0]
+    self.n2 = a.cayley.shape[0]
+    
+    
+  def __iter__(self):
+    
+    self.underlyingIter = itertools.combinations(range(1, self.n2), self.n1-1)
+    return self
+  
+  def __next__(self):
+    
+    while True:
+    
+      pp = next(self.underlyingIter)
+      is_good = True
+
+      for i_b, j_b in itertools.product(range(1, self.n1), repeat=2):
+        
+        i_a = pp[i_b-1]
+        j_a = pp[j_b-1]
+        
+        k_b = self.b[i_b, j_b]
+        k_a = self.a[i_a, j_a]
+        
+        if k_b == 0:
+          if k_a != 0:
+            is_good = False
+        elif k_a != pp[k_b-1]:
+          is_good = False
+          
+        if not is_good:
+          break
+      
+      if is_good:
+        return (0,) + pp   # extend by the identity
+      
+      # Otherwise go round and try the next one....
+
+
+
+def isSubgroup(b, a):
+  # Is "b" a subgroup of "a"?
+  
+  if next(iter(subgroupOf(b, a))):
+    return True
+  else:
+    return False
+
+
+
+def isNormalSubgroup(b, a):
+  
+  n1 = b.cayley.shape[0]
+  n2 = a.cayley.shape[1]
+  
+  for pp in subgroupOf(b, a):
+    
+    if len(pp) != n1:
+      raise Exception("Unexpected length!")
+    
+    
+    # Test for normality, using the definition
+    
+    is_normal = True
+    
+    for g in range(n2):
+      
+      g_inv = -1
+      for j in range(n2):
+        if a.cayley[g, j] == 0:
+          g_inv = j
+          break
+        
+      if g_inv < 0:
+        raise Exception("Not a group -- inverse not found!")
+        
+      for n in range(n1):
+        
+        # Calculate gng`.
+        
+        gn = a.cayley[g, pp[n]]
+        gng_inv = a.cayley[gn, g_inv]
+        
+        if gng_inv not in pp:
+          is_normal = False
+          break
+    if is_normal:
+      return True
+      
+  return False
 
