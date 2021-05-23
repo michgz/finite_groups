@@ -16,8 +16,8 @@ class algebra:
     except AttributeError:   # Need to accept c == None
       pass
   
-  def cayley(self):
-    return self.cayley
+  #def cayley(self):
+  #  return self.cayley
     
   def order(self):
     try:
