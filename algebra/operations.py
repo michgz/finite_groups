@@ -181,9 +181,10 @@ class subgroupOf:
 def isSubgroup(b, a):
   # Is "b" a subgroup of "a"?
   
-  if next(iter(subgroupOf(b, a))):
+  try:
+    next(iter(subgroupOf(b, a)))
     return True
-  else:
+  except StopIteration:
     return False
 
 
