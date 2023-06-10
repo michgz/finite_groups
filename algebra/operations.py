@@ -37,13 +37,67 @@ def isIsomorphic(a, b):
 
   n1 = a.cayley.shape[0]
   n2 = b.cayley.shape[0]
+  
+  
+  # If cayley tables are different shapes, we can't possibly have isomorphism
   if n1 != n2:
     return False
-    
+  
+  
+  # Calculate the order of each element, to reduce the number of permutations to
+  # check. Does this assume group axioms hold ????   If so, might need to check
+  # those first.
+  
+  orders_1 = numpy.empty((1, n1), dtype=numpy.uint32)
+  orders_2 = numpy.empty((1, n2), dtype=numpy.uint32)
+  
+  for i in range(n1):
+    x = 0
+    v = 0
+    while True:
+      v = a.cayley[i, v]
+      if v == 0:
+        orders_1[0, i] = x
+        break
+      x += 1 
+      if x > n1:
+        # This should be impossible! Maybe we don't have a group?
+        raise Exception
+  for i in range(n2):
+    x = 0
+    v = 0
+    while True:
+      v = b.cayley[i, v]
+      if v == 0:
+        orders_2[0, i] = x
+        break
+      x += 1 
+      if x > n2:
+        # This should be impossible! Maybe we don't have a group?
+        raise Exception
+  
+  if orders_1[0, 0] != 0 or orders_2[0, 0] != 0:
+    # The identity must have order 0. Otherwise something is wrong....
+    raise Exception
+  
   for pp in itertools.permutations(range(1,n1)):
     # For each permutation...
     
     is_okay = True
+    
+    
+    # Check the correspondence of orders
+    for i_a in range(n1):
+      if i_a == 0:
+        i_b = 0
+      else:
+        i_b = pp[i_a-1]
+      if orders_1[0, i_a] != orders_2[0, i_b]:
+        is_okay = False
+        break
+
+    if not is_okay:
+      continue
     
     for i_a, j_a in itertools.product(range(n1), range(n1)):
       # Check each element of the arrays
