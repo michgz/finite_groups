@@ -21,7 +21,7 @@ def directProduct(a, b):
       
       c[u + n1*v, w + n1*x] = a.cayley[u, w] + n1*b.cayley[v,x]
       
-  return c
+  return algebra.algebra(c)
 
 
 
