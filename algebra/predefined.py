@@ -18,17 +18,34 @@ def Dih(n):
       [2,3,0,1],
       [3,2,1,0]])
     return algebra.algebra(c)
-  elif n == 3:
-    c = numpy.array([
-      [0,1,2,3,4,5],
-      [1,2,0,4,5,3],
-      [2,0,1,5,3,4],
-      [3,5,4,0,2,1],
-      [4,3,5,1,0,2],
-      [5,4,3,2,1,0]])
+  elif n < 100:
+    c = numpy.empty((2*n, 2*n), dtype=numpy.uint32)
+    
+    # This is based on the presentation a^4 = b^2 = 0, a*b = b*a^-1
+    
+    # The first quadrant: a^i * a^j  == a^(i+j % n)
+    for i in range(n):
+      for j in range(n):
+        c[i, j] = ((i+j) % n)
+    
+    # The second quadrant:  a^i * b * a^j == b * a^(-i+j % n)
+    for i in range(n):
+      for j in range(n):
+        c[i, n+j] = n + ((-i+j) % n)
+
+    # Third quadrant:   b * a^i * a^j  == b * a^(i+j % n)
+    for i in range(n):
+      for j in range(n):
+        c[n+i, j] = n + ((i+j) %n)
+    
+    # Fourth quadrant:   b * a^i * b * a^j == a^(-i+j % n)
+    for i in range(n):
+      for j in range(n):
+        c[n+i, n+j] = ((-i+j) % n)
+
     return algebra.algebra(c)
   else:
-    raise Exception("Dihedral groups so far only defined for n<4")
+    raise Exception("Dihedral groups so far only defined for n<100")
 
 
 
