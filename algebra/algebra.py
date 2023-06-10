@@ -31,7 +31,57 @@ class algebra:
     
   def setOrder(self, order):
     self.order_ = order
-    
+  
+  '''
+  Check if element 0 is an identity
+  '''
+  def _checkIdentity(self):
+    n = self.cayley.shape[0]
+    for i in range(n):
+      if self.cayley[i, 0] != i:
+        return False
+      if self.cayley[0, i] != i:
+        return False
+    return True
+  
+  '''
+  Check if each element has a unique two-sided inverse. Assume that existence
+  of the identity has already been confirmed.
+  '''
+  def _checkInverses(self):
+    n = self.cayley.shape[0]
+    for i in range(n):
+      num_l = 0
+      num_r = 0
+      for j in range(n):
+        if self.cayley[i, j] == 0:
+          num_l += 1
+        if self.cayley[j, i] == 0:
+          num_r += 1
+      if num_l != 1 or num_r != 1:
+        return False
+      # Do we need to check that left-inverse==right-inverse? I'm
+      # sure it's always true as long as we assume associativity (?)
+    return True
+
+
+  '''
+  Check associativity
+  '''
+  def _checkAssociativity(self):
+    n = self.cayley.shape[0]
+    for i in range(n):
+      for j in range(n):
+        for k in range(n):
+          i_jk = self.cayley[i, self.cayley[j, k]]
+          ij_k = self.cayley[self.cayley[i, j], k]
+          if i_jk != ij_k:
+            return False
+    return True
+
+
+
+  
   def isGroup(self):
     n = self.order()
     if self.cayley.shape != (n, n):
