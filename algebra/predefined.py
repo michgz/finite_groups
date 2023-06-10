@@ -21,7 +21,7 @@ def Dih(n):
   elif n < 100:
     c = numpy.empty((2*n, 2*n), dtype=numpy.uint32)
     
-    # This is based on the presentation a^4 = b^2 = 0, a*b = b*a^-1
+    # This is based on the presentation a^n = b^2 = 0, a*b = b*a^-1
     
     # The first quadrant: a^i * a^j  == a^(i+j % n)
     for i in range(n):
