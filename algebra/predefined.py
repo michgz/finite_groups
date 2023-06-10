@@ -3,7 +3,7 @@ Create some pre-defined non-simple groups. Pre-defined simple groups can be
 created using the `simple` module
 '''
 
-from algebra import algebra, simple
+from algebra import algebra, simple, coxeter
 import numpy
 
 def Dih(n):
@@ -46,6 +46,28 @@ def Dih(n):
     return algebra.algebra(c)
   else:
     raise Exception("Dihedral groups so far only defined for n<100")
+
+
+
+def Sym(n):
+  '''
+  Symmetric group on n elements. It is a coxeter group, and we generate it from
+  its coxeter matrix
+  '''
+  
+  x = 2.*numpy.ones((n, n), dtype=numpy.uint32)
+  # Most elements are 2's. Diagonal & second-diagonals are only exceptions
+
+  # Diagonals are 1
+  for i in range(n):
+    x[i, i] = 1
+  
+  # Second-diagonals are 3
+  for i in range(n-1):
+    x[i, i+1] = 3
+    x[i+1, i] = 3
+
+  return coxeter.fromMatrix(x)
 
 
 
